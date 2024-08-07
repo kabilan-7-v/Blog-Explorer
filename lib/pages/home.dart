@@ -2,6 +2,7 @@ import 'package:blog_explorer/blocs/app_bloc.dart';
 import 'package:blog_explorer/blocs/app_events.dart';
 import 'package:blog_explorer/blocs/app_state.dart';
 import 'package:blog_explorer/models/blogdetails.dart';
+import 'package:blog_explorer/pages/detail_bloc_view.dart';
 import 'package:blog_explorer/server/api.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,7 @@ class _HomepageState extends State<Homepage> {
           //   Icons.menu,
           //   color: Colors.white,
           // ),
+
           title: const Text(
             "Blog and Activites",
             style: TextStyle(
@@ -50,7 +52,7 @@ class _HomepageState extends State<Homepage> {
             )
           ],
         ),
-        drawer: Drawer(
+        drawer: const Drawer(
           child: Column(
             children: [],
           ),
@@ -71,7 +73,15 @@ class _HomepageState extends State<Homepage> {
                     physics: const NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
                       return customblogs(context, userlist[index].Imgurl,
-                          userlist[index].tittle);
+                          userlist[index].tittle, () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DetailBlocView(
+                                      imgurl: userlist[index].Imgurl,
+                                      tittle: userlist[index].tittle,
+                                    )));
+                      });
                     },
                   )
                 ],
@@ -98,35 +108,40 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  customblogs(BuildContext context, imgurl, String text) {
-    return Column(
-      children: [
-        Container(
-            // margin: const EdgeInsets.all(10),
-            height: 180,
+  customblogs(BuildContext context, imgurl, String text, VoidCallback func) {
+    return InkWell(
+      onTap: func,
+      child: Column(
+        children: [
+          Container(
+              // margin: const EdgeInsets.all(10),
+              height: 180,
+              width: MediaQuery.of(context).size.width,
+              decoration: const BoxDecoration(),
+              child: CachedNetworkImage(
+                scale: 1.0,
+                repeat: ImageRepeat.noRepeat,
+                fit: BoxFit.cover,
+                imageUrl: imgurl,
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    const Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+              )),
+          Container(
+            height: 100,
             width: MediaQuery.of(context).size.width,
-            decoration: const BoxDecoration(),
-            child: CachedNetworkImage(
-              fit: BoxFit.cover,
-              imageUrl: imgurl,
-              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) => Icon(Icons.error),
+            color: Colors.black,
+            child: Center(
+                child: Text(
+              text,
+              style: const TextStyle(color: Colors.white),
             )),
-        Container(
-          height: 100,
-          width: MediaQuery.of(context).size.width,
-          color: Colors.black,
-          child: Center(
-              child: Text(
-            text,
-            style: const TextStyle(color: Colors.white),
-          )),
-        ),
-        const SizedBox(
-          height: 5,
-        )
-      ],
+          ),
+          const SizedBox(
+            height: 5,
+          )
+        ],
+      ),
     );
   }
 }
